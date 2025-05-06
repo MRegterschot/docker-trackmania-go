@@ -195,8 +195,7 @@ The image contains a file manager that allows you to manage files on the server.
 - `GET /UserData/*` - Pass the path to the file or directory you want to access.
 
 ```bash
-curl -X GET http://localhost:3300/UserData/Maps/MatchSettings \
-  -H 'Content-Type: application/json'
+curl -X GET http://localhost:3300/UserData/Maps/MatchSettings
 ```
 
 ```json
@@ -228,7 +227,7 @@ curl -X POST http://localhost:3300/upload \
 
 Files will be saved at `/UserData/Maps/MatchSettings/file1.txt` and `/UserData/Maps/MatchSettings/file2.txt`.
 
-- `DELETE /delete` - Pass the path to the files or directories you want to delete.
+- `DELETE /delete` - Pass the path to the files or directories you want to delete. The request should be made with the `application/json` content type.
 
 ```bash
 curl -X DELETE http://localhost:3300/delete \
