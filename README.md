@@ -196,6 +196,8 @@ The image contains a file manager that allows you to manage files on the server.
 - `POST /upload` - Upload files to the server. The files will be saved at the path from the filename. The request should be made with the `multipart/form-data` content type and the files should be passed in the `files` field. For example, if you upload a file named `Maps/test.txt`, it will be saved as `/UserData/Maps/test.txt`.
 - `DELETE /delete` - Pass the path to the files or directories you want to delete. The request should be made with the `application/json` content type and the paths should be passed in the body as a JSON array. For example, `["Maps/test.txt", "Maps/Downloaded"]` will delete the file `/UserData/Maps/test.txt` and the `/UserData/Maps/Downloaded` directory.
 
+---
+
 ### 🔧 Modifications
 
 This image is a modified version of the original [`evoesports/trackmania`](https://hub.docker.com/r/evoesports/trackmania) container.
