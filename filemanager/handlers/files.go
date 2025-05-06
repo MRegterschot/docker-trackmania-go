@@ -24,13 +24,18 @@ func HandleUploadFiles(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString("No files found")
 	}
 
+	paths := form.Value["paths[]"]
+	if len(files) != len(paths) {
+		return c.Status(fiber.StatusBadRequest).SendString("Number of files and paths do not match")
+	}
+
 	var errors []string
 
-	for _, file := range files {
-		dir := filepath.Dir(file.Filename)
+	for i, file := range files {
+		relativePath := paths[i]
 
 		// Set the destination path for the uploaded file
-		dest := filepath.Join(config.AppEnv.UserDataPath, filepath.Clean("/"+dir))
+		dest := filepath.Join(config.AppEnv.UserDataPath, filepath.Clean("/"+relativePath))
 
 		// Check if the path is in the UserData directory
 		if !strings.HasPrefix(dest, config.AppEnv.UserDataPath) {
@@ -39,21 +44,21 @@ func HandleUploadFiles(c *fiber.Ctx) error {
 		}
 
 		// Create the directory if it doesn't exist
-		if err := os.MkdirAll(dest, os.ModePerm); err != nil {
+		dir := filepath.Dir(dest)
+		if err := os.MkdirAll(dir, os.ModePerm); err != nil {
 			zap.L().Error("Error creating directory", zap.String("path", dest), zap.Error(err))
 			errors = append(errors, "Failed to create directory: "+dest)
 			continue
 		}
 
 		// Save the file to the destination
-		targetPath := filepath.Join(dest, filepath.Base(file.Filename))
-		if err := c.SaveFile(file, targetPath); err != nil {
-			zap.L().Error("Error saving file", zap.String("path", targetPath), zap.Error(err))
+		if err := c.SaveFile(file, dest); err != nil {
+			zap.L().Error("Error saving file", zap.String("path", dest), zap.Error(err))
 			errors = append(errors, "Failed to save file: "+file.Filename)
 			continue
 		}
 
-		zap.L().Info("File uploaded", zap.String("path", targetPath))
+		zap.L().Info("File uploaded", zap.String("path", dest))
 	}
 
 	if len(errors) > 0 {
@@ -151,7 +156,7 @@ func HandleListFiles(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString("Failed to read directory")
 	}
 
-	var result []structs.FileEntry
+	result := make([]structs.FileEntry, 0, len(entries))
 	for _, entry := range entries {
 		entryInfo, _ := entry.Info()
 		result = append(result, structs.FileEntry{

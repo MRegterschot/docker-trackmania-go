@@ -192,9 +192,51 @@ trackmania_player_max{type="spectators"} 32.0
 
 The image contains a file manager that allows you to manage files on the server. The following endpoints are available:
 
-- `GET /UserData/*` - Pass the path to the file or directory you want to access. For example, `GET /UserData/Maps` will return a list of maps on the server.
-- `POST /upload` - Upload files to the server. The files will be saved at the path from the filename. The request should be made with the `multipart/form-data` content type and the files should be passed in the `files` field. For example, if you upload a file named `Maps/test.txt`, it will be saved as `/UserData/Maps/test.txt`.
-- `DELETE /delete` - Pass the path to the files or directories you want to delete. The request should be made with the `application/json` content type and the paths should be passed in the body as a JSON array. For example, `["Maps/test.txt", "Maps/Downloaded"]` will delete the file `/UserData/Maps/test.txt` and the `/UserData/Maps/Downloaded` directory.
+- `GET /UserData/*` - Pass the path to the file or directory you want to access.
+
+```bash
+curl -X GET http://localhost:3300/UserData/Maps/MatchSettings \
+  -H 'Content-Type: application/json'
+```
+
+```json
+[
+  {
+    "name": "default.txt",
+    "path": "/UserData/Maps/MatchSettings/default.txt",
+    "isDir": false,
+    "size": 123456
+  },
+  {
+    "name": "example.txt",
+    "path": "/UserData/Maps/MatchSettings/example.txt",
+    "isDir": false,
+    "size": 654321
+  }
+]
+```
+
+- `POST /upload` - Upload files to the server. The files will be saved at the path from the passed `paths`. The paths field is an array that specifies where each uploaded file should be saved, including its folder and filename. Each index in paths[] corresponds to the same index in files[]. For example, files[0] will be saved at paths[0], and files[1] at paths[1]. The request should be made with the `multipart/form-data` content type.
+
+```bash
+curl -X POST http://localhost:3300/upload \
+  -F "files=@/path/to/file1.txt" \
+  -F "files=@/path/to/file2.txt" \
+  -F 'paths[]=/Maps/MatchSettings/file1.txt' \
+  -F 'paths[]=/Maps/MatchSettings/file2.txt'
+```
+
+Files will be saved at `/UserData/Maps/MatchSettings/file1.txt` and `/UserData/Maps/MatchSettings/file2.txt`.
+
+- `DELETE /delete` - Pass the path to the files or directories you want to delete.
+
+```bash
+curl -X DELETE http://localhost:3300/delete \
+  -H 'Content-Type: application/json' \
+  -d '["/Maps/MatchSettings/file1.txt", "/Maps/MatchSettings/file2.txt"]'
+```
+
+Deletes the `/UserData/Maps/MatchSettings/file1.txt` and `/UserData/Maps/MatchSettings/file2.txt` files.
 
 ---
 
