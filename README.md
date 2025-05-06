@@ -215,6 +215,8 @@ curl -X GET http://localhost:3300/UserData/Maps/MatchSettings
 ]
 ```
 
+---
+
 - `POST /upload` - Upload files to the server. The files will be saved at the path from the passed `paths`. The paths field is an array that specifies where each uploaded file should be saved, including its folder and filename. Each index in paths[] corresponds to the same index in files[]. For example, files[0] will be saved at paths[0], and files[1] at paths[1]. The request should be made with the `multipart/form-data` content type.
 
 ```bash
@@ -226,6 +228,8 @@ curl -X POST http://localhost:3300/upload \
 ```
 
 Files will be saved at `/UserData/Maps/MatchSettings/file1.txt` and `/UserData/Maps/MatchSettings/file2.txt`.
+
+---
 
 - `DELETE /delete` - Pass the path to the files or directories you want to delete. The request should be made with the `application/json` content type.
 
