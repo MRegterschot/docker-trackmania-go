@@ -1,8 +1,9 @@
 package config
 
 import (
-	"fmt"
+	"errors"
 	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/MRegterschot/docker-trackmania-plus/filemanager/structs"
@@ -13,7 +14,7 @@ var AppEnv *structs.Env
 
 func LoadEnv() error {
 	if err := godotenv.Load(); err != nil {
-		fmt.Println("Error loading .env file")
+		return errors.New("failed to load .env file")
 	}
 
 	port, err := strconv.Atoi(os.Getenv("FM_PORT"))
@@ -26,10 +27,15 @@ func LoadEnv() error {
 		userDataPath = "/server/UserData"
 	}
 
+	absPath, err := filepath.Abs(userDataPath)
+	if err != nil {
+		return errors.New("failed to get absolute path for UserData directory")
+	}
+
 	AppEnv = &structs.Env{
 		Port:         port,
 		LogLevel:     os.Getenv("FM_LOG_LEVEL"),
-		UserDataPath: userDataPath,
+		UserDataPath: absPath,
 	}
 
 	return nil

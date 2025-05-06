@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/MRegterschot/docker-trackmania-plus/filemanager/config"
+	"github.com/MRegterschot/docker-trackmania-plus/filemanager/structs"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 )
@@ -117,4 +119,53 @@ func HandleDeleteFiles(c *fiber.Ctx) error {
 	}
 
 	return c.SendString("Files deleted successfully")
+}
+
+// Handle file listing
+func HandleListFiles(c *fiber.Ctx) error {
+	relativePath := c.Params("*")
+	absPath := filepath.Join(config.AppEnv.UserDataPath, filepath.Clean("/"+relativePath))
+
+	// Prevent path traversal
+	if !strings.HasPrefix(absPath, config.AppEnv.UserDataPath) {
+		return c.Status(fiber.StatusForbidden).SendString("Invalid path")
+	}
+
+	info, err := os.Stat(absPath)
+	if os.IsNotExist(err) {
+		return c.Status(fiber.StatusNotFound).SendString("Path not found")
+	} else if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Error accessing path")
+	}
+
+	// If it's a file, serve the file
+	if !info.IsDir() {
+		return c.SendFile(absPath)
+	}
+
+	// If it's a directory, return JSON listing
+	entries, err := os.ReadDir(absPath)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Failed to read directory")
+	}
+
+	var result []structs.FileEntry
+	for _, entry := range entries {
+		entryInfo, _ := entry.Info()
+		result = append(result, structs.FileEntry{
+			Name:  entry.Name(),
+			Path:  filepath.Join("/UserData", relativePath, entry.Name()),
+			IsDir: entry.IsDir(),
+			Size:  getSizeIfFile(entryInfo),
+		})
+	}
+
+	return c.JSON(result)
+}
+
+func getSizeIfFile(info fs.FileInfo) int64 {
+	if info.IsDir() {
+		return 0
+	}
+	return info.Size()
 }
