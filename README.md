@@ -183,11 +183,11 @@ trackmania_player_max{type="spectators"} 32.0
 
 ---
 
-### 🔧 Modifications by
+### 🔧 Modifications
 
 This image is a modified version of the original [`evoesports/trackmania`](https://hub.docker.com/r/evoesports/trackmania) container.
 
-Modifications made by **Marijn Regtersct** (marijn.regterschot@gmail.com) include:
+Modifications made by **Marijn Regterschot** (marijn.regterschot@gmail.com) include:
 
 - Added file management endpoints to the application, allowing for easier management of server files.
 
