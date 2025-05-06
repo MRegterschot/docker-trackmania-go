@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -14,7 +15,7 @@ var AppEnv *structs.Env
 
 func LoadEnv() error {
 	if err := godotenv.Load(); err != nil {
-		return errors.New("failed to load .env file")
+		fmt.Println("Failed to load .env file, using default values")
 	}
 
 	port, err := strconv.Atoi(os.Getenv("FM_PORT"))
