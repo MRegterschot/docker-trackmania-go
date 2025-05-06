@@ -50,7 +50,7 @@ docker run \
   #-p 5000:5000/tcp \ # Be careful opening XMLRPC! Only if you really need to.
   #-p 9000:9000/tcp \ # For the prometheus exporter.
   -v UserData:/server/UserData \
-  evoesports/trackmania:latest
+  marijnregterschot/trackmania-plus:latest
 ```
 
 ### ... with 'docker compose'
@@ -60,7 +60,7 @@ Here is the `compose.yml`:
 ```yaml
 services:
   trackmania:
-    image: evoesports/trackmania:latest
+    image: marijnregterschot/trackmania-plus:latest
     ports:
       - 2350:2350/udp
       - 2350:2350/tcp
