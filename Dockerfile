@@ -4,6 +4,14 @@ WORKDIR /build
 COPY trackmania_exporter .
 RUN apk upgrade && apk add binutils && pip3 install --root-user-action=ignore prometheus-client pyinstaller && pyinstaller --onefile --console --clean --strip trackmania_exporter.py
 
+# build filemanager
+FROM golang:1.24-alpine AS filemanager-build
+WORKDIR /app
+COPY filemanager/go.mod filemanager/go.sum ./
+RUN go mod download
+COPY filemanager/. .
+RUN go build -o filemanager
+
 # build trackmania image
 FROM alpine:3.17
 
@@ -41,6 +49,7 @@ RUN true \
 
 COPY --chmod=0755 entrypoint.sh /usr/local/bin/
 COPY --chmod=0755 --from=exporter-build /build/dist/trackmania_exporter /usr/local/bin/
+COPY --chmod=0755 --from=filemanager-build /app/filemanager /usr/local/bin/
 
 USER trackmania
 
@@ -48,6 +57,7 @@ EXPOSE 2350/tcp
 EXPOSE 2350/udp
 EXPOSE 5000/tcp
 EXPOSE 9000/tcp
+EXPOSE 3300/tcp
 
 HEALTHCHECK --interval=5s --timeout=5s --start-period=20s --retries=3 \
     CMD nc -z -v 127.0.0.1 5000 || exit 1

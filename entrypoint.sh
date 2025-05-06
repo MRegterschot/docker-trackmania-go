@@ -182,5 +182,7 @@ if [ "$PROMETHEUS_ENABLE" = true ]; then
     /usr/local/bin/trackmania_exporter &
 fi
 
+/usr/local/bin/filemanager &
+
 # fire up the actual TM server
 exec "$@"

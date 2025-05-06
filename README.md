@@ -47,6 +47,7 @@ docker run \
   -e TM_MASTERSERVER_PASSWORD='YourMasterserverPassword' \
   -p 2350:2350/tcp \
   -p 2350:2350/udp \
+  #-p 3300:3300/tcp \ # Be careful opening the filemanager endpoints! Only if you really need to.
   #-p 5000:5000/tcp \ # Be careful opening XMLRPC! Only if you really need to.
   #-p 9000:9000/tcp \ # For the prometheus exporter.
   -v UserData:/server/UserData \
@@ -64,6 +65,7 @@ services:
     ports:
       - 2350:2350/udp
       - 2350:2350/tcp
+      #- 3300:3300/tcp # Be careful opening the filemanager endpoints! Only if you know what you're doing.
       #- 5000:5000/tcp # Be careful opening XMLRPC! Only if you know what you're doing.
       #- 9000:9000/tcp # For the prometheus exporter.
     environment:
@@ -75,7 +77,7 @@ volumes:
   UserData:
 ```
 
-In both cases, the server will launch and be bound to port 2350 TCP & UDP. Port 5000 (XMLRPC) & 9000 (Prometheus metrics) won't usually be forwarded to the host, because apps who need it (e.g. server controllers) are supposed to run in the same stack.
+In both cases, the server will launch and be bound to port 2350 TCP & UDP. Port 3300 (Filemanager), 5000 (XMLRPC) and 9000 (Prometheus metrics) won't usually be forwarded to the host, because apps who need it (e.g. server controllers) are supposed to run in the same stack.
 You need to provide server credentials you can register [here](https://players.trackmania.com/server/dedicated), and put the login into the `TM_MASTERSERVER_LOGIN` variable, and the password into the `TM_MASTERSERVER_PASSWORD` variable.
 The server only needs one volume to store your user data (e.g. maps, configs), which is mounted to /server/UserData. You can also use bind mounts.
 
@@ -129,6 +131,9 @@ Below is a list of all possible environment variables that can be set through Do
 | `PROMETHEUS_PORT` | The network port on which the Prometheus exporter listens for requests, used for gathering server metrics. | 9000 |
 | `PROMETHEUS_SUPERADMIN_PASSWORD` | The SuperAdmin password required by the Prometheus exporter to authenticate and access the server metrics if the default was changed. | SuperAdmin |
 | `PROMETHEUS_INTERVAL` | The frequency, in seconds, at which the Prometheus exporter collects metrics from the Trackmania server. | 15 |
+| `FM_PORT` | The port for the file manager, which allows for remote management of server files. | 3300 |
+| `FM_USERDATA_PATH` | The path to the user data directory, where server files and configurations are stored. | /server/UserData |
+| `FM_LOG_LEVEL` | The logging level for the file manager, which can be set to `DEBUG`, `INFO`, `WARNING` or `ERROR` to control the verbosity of log output. | INFO |
 [^1]: Default values are specific to this Docker image setup and may differ from those provided by the official TrackMania server from Ubisoft Nadeo.
 [^2]: More information to this can be gathered from the Trackmania Wiki page about the [Dedicated Config](https://wiki.trackmania.io/en/dedicated-server/Usage/DedicatedConfig).
 [^3]: If not set, the TrackMania server may report its internal Docker IP address to the master server, which can prevent external users from connecting to it.
@@ -182,6 +187,14 @@ trackmania_player_max{type="spectators"} 32.0
 ```
 
 ---
+
+### File Manager
+
+The image contains a file manager that allows you to manage files on the server. The following endpoints are available:
+
+- `GET /UserData/*` - Pass the path to the file or directory you want to access. For example, `GET /UserData/Maps` will return a list of maps on the server.
+- `POST /upload` - Upload files to the server. The files will be saved at the path from the filename. The request should be made with the `multipart/form-data` content type and the files should be passed in the `files` field. For example, if you upload a file named `Maps/test.txt`, it will be saved as `/UserData/Maps/test.txt`.
+- `DELETE /delete` - Pass the path to the files or directories you want to delete. The request should be made with the `application/json` content type and the paths should be passed in the body as a JSON array. For example, `["Maps/test.txt", "Maps/Downloaded"]` will delete the file `/UserData/Maps/test.txt` and the `/UserData/Maps/Downloaded` directory.
 
 ### 🔧 Modifications
 
