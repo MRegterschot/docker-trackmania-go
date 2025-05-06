@@ -13,10 +13,10 @@ ARG GLIBC_VERSION="2.33-r0" \
     BUILD_DATE \
     REVISION
 
-LABEL org.opencontainers.image.title="Trackmania Server" \
-      org.opencontainers.image.description="Server for the game Trackmania, released in 2020 by Nadeo." \
-      org.opencontainers.image.authors="Nicolas Graf <nicolas.j.graf@gmail.com>" \
-      org.opencontainers.image.vendor="Evo" \
+LABEL org.opencontainers.image.title="Trackmania Server Plus" \
+      org.opencontainers.image.description="Server for the game Trackmania, released in 2020 by Nadeo extended with file management endpoints." \
+      org.opencontainers.image.authors="Original: Nicolas Graf <nicolas.j.graf@gmail.com>; Modified by: Marijn Regterschot <marijn.regterschot@gmail.com>" \
+      org.opencontainers.image.vendor="Evo (original), Independent Contributor (modifications)" \
       org.opencontainers.image.licenses="Apache-2.0" \
       org.opencontainers.image.version=${VERSION} \
       org.opencontainers.image.created=${BUILD_DATE} \
