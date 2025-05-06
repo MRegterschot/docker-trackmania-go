@@ -47,9 +47,9 @@ docker run \
   -e TM_MASTERSERVER_PASSWORD='YourMasterserverPassword' \
   -p 2350:2350/tcp \
   -p 2350:2350/udp \
-  #-p 3300:3300/tcp \ # Be careful opening the filemanager endpoints! Only if you really need to.
   #-p 5000:5000/tcp \ # Be careful opening XMLRPC! Only if you really need to.
   #-p 9000:9000/tcp \ # For the prometheus exporter.
+  #-p 3300:3300/tcp \ # Be careful opening the filemanager endpoints! Only if you really need to.
   -v UserData:/server/UserData \
   marijnregterschot/trackmania-plus:latest
 ```
@@ -65,9 +65,9 @@ services:
     ports:
       - 2350:2350/udp
       - 2350:2350/tcp
-      #- 3300:3300/tcp # Be careful opening the filemanager endpoints! Only if you know what you're doing.
       #- 5000:5000/tcp # Be careful opening XMLRPC! Only if you know what you're doing.
       #- 9000:9000/tcp # For the prometheus exporter.
+      #- 3300:3300/tcp # Be careful opening the filemanager endpoints! Only if you know what you're doing.
     environment:
       TM_MASTERSERVER_LOGIN: "YourMasterserverLogin"
       TM_MASTERSERVER_PASSWORD: "YourMasterserverPassword"
